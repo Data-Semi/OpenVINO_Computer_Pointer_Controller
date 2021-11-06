@@ -18,11 +18,11 @@ import datetime
 
 log = logging.getLogger(__name__)
 
-model_precision_fd = 'FP16'
+model_precision_fd = 'FP32'
 
 # model_precision = 'FP32'
 # model_precision = 'FP16-INT8'
-model_precision = 'FP16'
+model_precision = 'FP32'
 
 # Default args
 m_fd = '../intel/face-detection-0200/' + model_precision_fd +'/face-detection-0200'
@@ -48,7 +48,8 @@ def build_argparser():
     required.add_argument('-pt', type=float, required=False, default=0.65, help='Probablity threshold for face detection, set a number between 0-1')
     required.add_argument('-v', type=str2bool, required=False, default='true', help='Visualization available flag - set to no display by default, to set display frames, specify \'t\' or \'yes\' or \'true\' or \'1\'')
     parser.add_argument('-cpu_ext', type=str, required=False, default=None, help='MKLDNN (CPU)-targeted custom layers. Absolute path to a shared library with the kernels impl.')
-    parser.add_argument('-flags', '--visualization_flags', type=str, required=False, nargs='+',
+#    parser.add_argument('-flags', '--visualization_flags', type=str, required=False, nargs='+',
+    parser.add_argument('-flags', type=str, required=False, nargs='+',
                         default=['fd', 'hpe', 'ld' ,'ge' ],
                         help="Visualization detail flags - set to display different model outputs of each frame. Example: -flag fd hpe ge fld (Seperate each flag by space)"
                              "fd for Face Detection Model, hpe for Head Pose Estimation Model,"
@@ -139,7 +140,7 @@ def pipeline(args):
         
             if (args.v):
                 v = Visualizer(frame, fd_img_output, fd_coords, ld_coords, eye_l_image,eye_r_image, hpe_output, mouse_xy,gaze_val)
-                vis_frame = v.visualizer(args.visualization_flags)
+                vis_frame = v.visualizer(args.flags)
                 writer.write(vis_frame)
     # Release the video writer
     writer.release()

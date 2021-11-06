@@ -1,97 +1,194 @@
 # Computer Pointer Controller
+This is the 2nd project in Udacity Intel® Edge AI for IoT Developers Nanodegree Program.  
+This project uses a gaze detection model to control the mouse pointer of my computer. To achieve this, I have used multiple models in the same machine and coordinate the flow of data between those models.  
 
-Run the code -1h
-11/3
-brush up the code -1h
-Write up the Read me -1hour
-Rubics -10min
-review 1h
-
-*TODO:* Write a short introduction to your project
-
+## Project Directories
+```
+├── README.md
+├── bin
+│   ├── demo.mp4
+│   └── demo_result.mp4
+├── metrics_stats_result
+│   └── 20211106_081627stats.txt
+├── requirements.txt
+└── src
+    ├── app.log
+    ├── face_detection.py
+    ├── facial_landmarks_detection.py
+    ├── gaze_estimation.py
+    ├── head_pose_estimation.py
+    ├── input_feeder.py
+    ├── main.py
+    ├── mouse_controller.py
+    └── visualize.py
+```
 ## Project Set Up and Installation
-1. Clone (or download) this repo
+This project will use InferenceEngine API from Intel's OpenVino ToolKit to build the project.  
+Environment has been used is as below:  
 ```
-git clone 
-
-cd 
+OS: Ubuntu18.04 run on WSL2 of Windows 10
+Openvino version: openvino_2021.4.689
+Python version: Python 3.6.9 (Default installed in Ubuntu18.04)
+```
+To install Openvino, please refer to:    
+https://docs.openvinotoolkit.org/latest/openvino_docs_install_guides_installing_openvino_linux.html  
+1. Clone (or download) this repository  
+```
+git clone this repository
 ```
 
-2. Create a virtual environment
-e.g.
+2. Create a virtual environment  
+In the main directory,
 ```
 python -m venv venv
-
 source venv/bin/activate
 ```
 
-3. Install application dependencies
+3. Install application dependencies  
 ```
 pip3 install -r requirements.txt
 ```
 
-4. Download the required models using the model downloader
+4. Download the required models using the model downloader  
+The gaze estimation model requires three inputs:  
+The head pose, the left eye image, the right eye image.  
+
+To get these inputs, I used below OpenVino models:  
+Face Detection  
+Head Pose Estimation  
+Facial Landmarks Detection.  
+
 ```
 python3  <path/to/downloader.py> --name <model-name>
 ```
+I used below command  
+```
+python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name head-pose-estimation-adas-0001
+python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name landmarks-regression-retail-0009
+python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name gaze-estimation-adas-0002
+python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name face-detection-0200
+```
 
 ## Demo
-Navigate to the `src/` directory and execute the `main.py` script with the required arguments.
-See the [documentation](#documentation) for more info.
+Navigate to the `src/` directory and execute the `main.py` script with the required arguments.  
+See the [documentation](#documentation) for more info.  
 ```
 python3 main.py <arguments>
 ```
-For example
+I have set the arguments default value inside the code, so that we can run with no argument for first try.  
 ```
 python main.py 
 ```
 
-
 ## Documentation
-*TODO:* Include any documentation that users might need to better understand your project code. For instance, this is a good place to explain the command line arguments that your project supports.
 
+| Arguments  | Description                                                                                                     | Required |
+|------------|-----------------------------------------------------------------------------------------------------------------|----------|
+| -h, --help | show this help message and exit                                                                                 | False    |
+| -cpu_ext   | MKLDNN (CPU) targeted custom layers. Absolute path to a shared library with the kernels impl.                   | False    |
+| -m_fd      | *Path to a IR model for face detection detection                                                                     | False     |
+| -m_hpe     | *Path to IR model for head pose estimation estimation                                                               | False     |
+| -m_ld      | *Path to IR model for facial landmark detection detection                                                          | False     |
+| -m_ge      | *Path to IR model for gaze estimation estimation                                                                    | False     |
+| -i         | *Path to image or video file, or 'cam' for web cam live feed                                              | False     |
+| -d         | Target device to infer on: CPU, GPU, FPGA or MYRIAD.(CPU by default)                              | False    |
+| -pt        | Probability treshold for face detection set a number between 0-1                                                               | False    |
+| -v         | Visualization flag - set to no display by default, to set display frames, specify 't' or 'yes' or 'true' or '1' | False    |
+| -flags         | Visualization flag - set to display different model outputs of each frame. Please see examples below.  | False    |
+*Do not add the model extension (e.g., .xml or .bin)  
+*Visualization detail flags examples: -flag fd hpe ge fld (Seperate each flag by space), fd for Face Detection Model, hpe for Head Pose Estimation Model, fld for Facial Landmark Detection Model, ge for Gaze Estimation Model."   
 
 ## Benchmarks
-*TODO:* Include the benchmark results of running your model on multiple hardwares and multiple model precisions. Your benchmarks can include: model loading time, input/output processing time, model inference time etc.
-for example: Benchmarking results for models of different precisions
-Discussion of the difference in the results among the models with different precisions (for instance, are some models more accurate than others?).
+I used different model precisions on a machine having Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz and 16 GB RAM.  
+The program write the results in a text file in 'folder metrics_stats_result' with every execution.  
+With all FP32 precision settings, the result was as below:  
+```
+Information of model name, model_precision, inference time(s), frame per second, load time(s)
+../intel/face-detection-0200/FP32/face-detection-0200
+FP32
+0.004693289934578589
+213
+0.10627484321594238
 
-## Results
-*TODO:* Discuss the benchmark results and explain why you are getting the results you are getting. For instance, explain why there is difference in inference time for FP32, FP16 and INT8 models.
+../intel/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009
+FP32
+0.0007434335805601992
+1345
+0.026098012924194336
+
+../intel/head-pose-estimation-adas-0001/FP32/head-pose-estimation-adas-0001
+FP32
+0.001200776989177122
+833
+0.03454089164733887
+
+../intel/gaze-estimation-adas-0002/FP32/gaze-estimation-adas-0002
+FP32
+0.0012780407727774926
+782
+0.041086435317993164  
+```
+With all FP16 precision settings, the result was as below:  
+
+```
+Information of model name, model_precision, inference time(s), frame per second, load time(s)
+
+../intel/face-detection-0200/FP16/face-detection-0200
+FP16
+0.00482627496881
+207
+0.1073923110961914
+
+../intel/landmarks-regression-retail-0009/FP16/landmarks-regression-retail-0009
+FP16
+0.0007310923883470438
+1368
+0.025674104690551758
+
+../intel/head-pose-estimation-adas-0001/FP16/head-pose-estimation-adas-0001
+FP16
+0.001198606976008011
+834
+0.040769338607788086
+
+../intel/gaze-estimation-adas-0002/FP16/gaze-estimation-adas-0002
+FP16
+0.001255003072447696
+797
+0.0440669059753418
+```
+
+## Results  
+The results show that model with lower precision (FP16) is having smaller inference time than higher precision(FP32).  
+This is because lower precision models use less memory and they are less expensive computationally.     
+Lower precision models loose some performance, I didn't observe big difference in this project.  
 
 ## Stand Out Suggestions
-This is where you can provide information about the stand out suggestions that you have attempted.
-
-### Async Inference
-If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
+- Display zoom in face image frame together with the original frame in the visualization part.
+- Save the result video in the folder ./bin
+- Save the metrics to a txt as a record for every excecute.  
+- Save logs into src/app.log for every important steps in the program 
 
 ### Edge Cases
-There will be certain situations that will break your inference flow. For instance, lighting changes or multiple people in the frame. Explain some of the edge cases you encountered in your project and how you solved them to make your project more robust.
+- If there is no face detected the application does not infer anything and logs an event of not detecting any face.  
+- If multiple face has been detected in a frame, the application considers the first detected face for inference.  
 
-------------------------------------------
-Rubic memo point
-
-The project demonstrates an ability to show output of intermediate models for visualization.
-
-The code allows the user to set a flag that can display the outputs of intermediate models.
-
-The output is shown using a visualization of the output model (not just printed).
-
-
------------------------------------------
-Where possible, default arguments are used for when the user does not specify the arguments.
-
-A --help option should be present and should display information about the different configurations.
-
-# Others
-1. DISPLAY error
-The message was xhost:  unable to open display ":0.0"
-Solved by:
-Set DISPLAY correctly for WSL2 system, add below line to ~/.bashrc
+# Thouble shootings
+### 1. DISPLAY setting error
+The message was,
 ```
-    export DISPLAY="$(grep nameserver /etc/resolv.conf | sed 's/nameserver //'):0"
+xhost:  unable to open display ":0.0"
 ```
-Check if it is correctly set
+Solution found:  
+Set DISPLAY correctly for WSL2 system, need to set display address accordingly instead of :0
+The command is as below:  
+
+```
+echo "export DISPLAY=\$(grep nameserver /etc/resolv.conf | sed 's/nameserver //'):0" >> ~/.bashrc
+source ~/.bashrc
+source ../venv/bin/activate
+```
+Check if the environment variable has been set correctly  
 ```
 echo $DISPLAY
 ```
@@ -99,17 +196,16 @@ Disable access control by bellow command line.
 ```
 xhost +
 ```
-Download X server "VcXsrv" and set the correct firewall settings as below
+Download and Install X server "VcXsrv" and set the parameter -ac in "Extra Settings" window when start the software, and set correct firewall settings as below.  
+ 
+```
+Go to Control Panel > System and Security > Windows Defender Firewall > Advanced Settings > Inbound Rules > New Rule... > Program > %ProgramFiles%\VcXsrv\vcxsrv.exe > Allow the connection > checked Domain/Private/Public > Named and Confirmed Rule.  
+```
+You can find here https://github.com/microsoft/WSL/issues/6430 for more informations.
 
-I went to Control Panel > System and Security > Windows Defender Firewall > Advanced Settings > Inbound Rules > New Rule... > Program > %ProgramFiles%\VcXsrv\vcxsrv.exe > Allow the connection > checked Domain/Private/Public > Named and Confirmed Rule.
-You can find here https://github.com/microsoft/WSL/issues/6430 for more detail
-
-2. IR model not readable error
+### 2. IR model not readable error
 The error message was:  
+```
 RuntimeError: The support of IR v6 has been removed from the product. Please, convert the original model using the Model Optimizer which comes with this version of the OpenVINO to generate supported IR version.  
-
-Solved by re download the model by below command line from the main directory:
-
 ```
-python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name landmarks-regression-retail-0009
-```
+Solved by re-download the model by below command line from the main directory.

@@ -1,0 +1,26 @@
+Metrics stats of the program run at 2021-11-06 14:23:35.684758
+Information of model name, model_precision, inference time(s), frame per second, load time(s)
+
+../intel/face-detection-0200/FP16/face-detection-0200
+FP16
+0.004672886961597508
+214
+0.11205768585205078
+
+../intel/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009
+FP32
+0.0007385601431636487
+1354
+0.02632451057434082
+
+../intel/head-pose-estimation-adas-0001/FP32/head-pose-estimation-adas-0001
+FP32
+0.0011618258589405125
+861
+0.0339052677154541
+
+../intel/gaze-estimation-adas-0002/FP32/gaze-estimation-adas-0002
+FP32
+0.0012461250111208124
+802
+0.04034066200256348
