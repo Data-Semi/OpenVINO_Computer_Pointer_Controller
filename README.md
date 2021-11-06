@@ -1,6 +1,16 @@
 # Computer Pointer Controller
 This is the 2nd project in Udacity Intel® Edge AI for IoT Developers Nanodegree Program.  
-This project uses a gaze detection model to control the mouse pointer of my computer. To achieve this, I have used multiple models in the same machine and coordinate the flow of data between those models.  
+This project uses a gaze detection model to control the mouse pointer of my computer. To achieve this, I have used multiple models in the same machine and coordinate the flow of data between those models.
+The gaze estimation model requires three inputs: The head pose, the left eye image, the right eye image.  
+
+To get these inputs, I used below OpenVino models:  
+- face-detection-0200    
+- head-pose-estimation-adas-0001   
+- landmarks-regression-retail-0009  
+- gaze-estimation-adas-0002  
+
+The following diagram illustrates the workflow:   
+![workflow-diagram](images/pipeline.png)  
 
 ## Project Directories
 ```
@@ -33,47 +43,39 @@ Python version: Python 3.6.9 (Default installed in Ubuntu18.04)
 To install Openvino, please refer to:    
 https://docs.openvinotoolkit.org/latest/openvino_docs_install_guides_installing_openvino_linux.html  
 1. Clone (or download) this repository  
+
 ```
 git clone this repository
 ```
 
 2. Create a virtual environment  
-In the main directory,
+
 ```
 python -m venv venv
 source venv/bin/activate
 ```
 
 3. Install application dependencies  
+
 ```
 pip3 install -r requirements.txt
 ```
 
 4. Download the required models using the model downloader  
-The gaze estimation model requires three inputs:  
-The head pose, the left eye image, the right eye image.  
-
-To get these inputs, I used below OpenVino models:  
-Face Detection  
-Head Pose Estimation  
-Facial Landmarks Detection.  
-
+ 
 ```
-python3  <path/to/downloader.py> --name <model-name>
-```
-I used below command  
-```
+python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name face-detection-0200
 python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name head-pose-estimation-adas-0001
 python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name landmarks-regression-retail-0009
 python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name gaze-estimation-adas-0002
-python /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name face-detection-0200
+
 ```
 
 ## Demo
 Navigate to the `src/` directory and execute the `main.py` script with the required arguments.  
 See the [documentation](#documentation) for more info.  
 ```
-python3 main.py <arguments>
+python main.py <arguments>
 ```
 I have set the arguments default value inside the code, so that we can run with no argument for first try.  
 ```
@@ -96,7 +98,8 @@ python main.py
 | -v         | Visualization flag - set to no display by default, to set display frames, specify 't' or 'yes' or 'true' or '1' | False    |
 | -flags         | Visualization flag - set to display different model outputs of each frame. Please see examples below.  | False    |
 *Do not add the model extension (e.g., .xml or .bin)  
-*Visualization detail flags examples: -flag fd hpe ge fld (Seperate each flag by space), fd for Face Detection Model, hpe for Head Pose Estimation Model, fld for Facial Landmark Detection Model, ge for Gaze Estimation Model."   
+
+- Visualization detail flags examples: -flag fd hpe ge fld (Seperate each flag by space), fd for Face Detection Model, hpe for Head Pose Estimation Model, fld for Facial Landmark Detection Model, ge for Gaze Estimation Model."   
 
 ## Benchmarks
 I used different model precisions on a machine having Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz and 16 GB RAM.  
@@ -173,7 +176,7 @@ Lower precision models loose some performance, I didn't observe big difference i
 - If there is no face detected the application does not infer anything and logs an event of not detecting any face.  
 - If multiple face has been detected in a frame, the application considers the first detected face for inference.  
 
-# Thouble shootings
+## Thouble shootings
 ### 1. DISPLAY setting error
 The message was,
 ```
